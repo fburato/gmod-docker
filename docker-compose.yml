@@ -1,0 +1,18 @@
+version: '3'
+services:
+    gmod:
+      build: .
+      image: gmod
+      container_name: "gmod"
+      ports:
+        - "27015:27015/udp"
+      environment:
+         COLLECTION: 934767722
+         GAMEMODE: prop_hunt
+         SERVERNAME: "Frank's realm"
+      stdin_open: true
+      tty: true
+      volumes:
+        - ./data:/gmod/garrysmod/data
+        - ./cfg:/gmod/garrysmod/cfg
+        - ./cache:/gmod/garrysmod/cache
