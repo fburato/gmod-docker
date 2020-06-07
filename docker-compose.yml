@@ -6,6 +6,8 @@ services:
       container_name: "gmod"
       ports:
         - "27015:27015/udp"
+        - "27005:27005"
+        - "27030:27030"
       environment:
          COLLECTION: 934767722
          GAMEMODE: prop_hunt
