@@ -1,4 +1,4 @@
-FROM ubuntu:xenial
+FROM ubuntu:jammy
 
 ARG UID=1000
 # install dependencies for i368 architecture
@@ -28,8 +28,21 @@ USER ${UID}
 # install gmod
 RUN ${GMOD_HOME}/steam/steamcmd.sh +login anonymous +force_install_dir "${GMOD_HOME}/gmod" +app_update $APP_ID validate +quit
 
-COPY entrypoint.sh ${GMOD_HOME}/entrypoint.sh
-WORKDIR ${GMOD_HOME}}
+WORKDIR ${GMOD_HOME}
+
+VOLUME /data
+
+ENV VOLUME /data
+
+ADD /entrypoint.sh /entrypoint.sh
+
+ENTRYPOINT [ "/entrypoint.sh" ]
+
 EXPOSE 27015/udp 27005 27030
 
-ENTRYPOINT [ "/home/gmod/entrypoint.sh" ]
+CMD [ "/home/gmod/gmod/srcds_run", \
+      "-game", "garrysmod",  \
+      "+maxplayers", "12" \
+      "+gamemode",  "sandbox" \
+      "+map", "gm_flatgrass", \
+      "+hostname", "Frank's Realm"]
