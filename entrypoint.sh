@@ -1,43 +1,30 @@
 #!/bin/bash -e
+
 initVolume () {
-  local subdir=$1;
-  echo "> Initialising $subdir";
-  if [ -e $VOLUME/gmod/$subdir ];
-  then
-    echo "> $subdir in $VOLUME/gmod detected, linking $subdir";
-    if [ -e $HOME/gmod/$subdir ]
-    then
-      mkdir -p $(dirname $HOME/gmod/$subdir.old);
-      mv $HOME/gmod/$subdir $HOME/gmod/$subdir.old;
-    fi
-    mkdir -p $(dirname $HOME/gmod/$subdir)
-    ln -s $VOLUME/gmod/$subdir $HOME/gmod/$subdir;
-  elif [ ! -w $VOLUME/gmod ];
+  local subdir=$1
+  local remote=$VOLUME/gmod/$subdir
+  local internal=$HOME/gmod/$subdir
+  echo "> Initialising $subdir"
+  if [ ! -w $VOLUME/gmod ]
   then 
     echo "! Volume $VOLUME/gmod is not writable, starting application with factory $subdir";
-  elif [ -e $HOME/gmod/$subdir ]
+    return
+  fi
+  if [ ! -e $internal ]
+  then 
+    mkdir -p $internal
+  fi
+  # $VOLUME/gmod is writable, $HOME/gmod/$subdir exists
+  if [ ! -e $remote ]
   then
-    echo "> Volume $VOLUME/gmod is writable, populating it with factory $subdir and linking $subdir";
-    mkdir -p $(dirname $VOLUME/gmod/$subdir)
-    cp -R $HOME/gmod/$subdir $VOLUME/gmod/$subdir;
-    mkdir -p $(dirname $HOME/gmod/$subdir.old)
-    mv $HOME/gmod/$subdir $HOME/gmod/$subdir.old;
-    ln -s $VOLUME/gmod/$subdir $HOME/gmod/$subdir;
-  else
-    echo "> Volume $VOLUME/gmod is writable, linking $subdir"
-    if [[ "$(dirname $VOLUME/gmod/$subdir)" == "$VOLUME/gmod" ]]
-    then
-      mkdir -p $VOLUME/gmod/$subdir
-    else 
-      mkdir -p $(dirname $VOLUME/gmod/$subdir)
-    fi
-    if [ ! -e $VOLUME/gmod/$subdir ]
-    then 
-      mkdir -p $VOLUME/gmod/$subdir
-    fi
-    mkdir -p $(dirname $HOME/gmod/$subdir)
-    ln -s $VOLUME/gmod/$subdir $HOME/gmod/$subdir
-  fi;
+    echo "> Volume $remote does not exist, creating and initialising with content from $internal"
+    mkdir -p $remote
+    cp -R $internal $(dirname $remote)
+  fi
+  echo "> Linking $remote to $internal"
+  # $VOLUME/gmod/$subdir contains all the necessary content
+  rm -rf $internal
+  ln -s $remote $(dirname $internal)
 }
 
 echo "> Performing volume initialisation"
@@ -47,6 +34,7 @@ initVolume "garrysmod/addons"
 initVolume "garrysmod/settings"
 initVolume "garrysmod/gamemodes"
 initVolume "garrysmod/data"
+initVolume "garrysmod/cache"
 initVolume "steam_cache"
 
 echo "> Running command"
