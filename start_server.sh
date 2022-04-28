@@ -1,5 +1,5 @@
 #!/bin/bash
-podman run -tid \
+podman run --rm -tid \
     -p 27015:27015/udp -p 27005:27005 -p 27030:27030 -v gmod:/data \
     --name gmod \
     gmod \
